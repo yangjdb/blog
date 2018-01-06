@@ -3,12 +3,13 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: YY 's Blog
-subtitle: little front engineer
-description: 3 level 3
-keywords:
+title: (S) => B
+subtitle: 不求闻达于世人，只愿风骚惊天下
+description: Front Engineer
+keywords: Nest TypeScript Node.js React Vue ES6 geeker
+language: zh-CN
 author: yangjd
-email: 403297504@qq.com
+email: 2420427860@qq.com
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
