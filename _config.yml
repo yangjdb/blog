@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: your title
-subtitle: your subtitle
-description: your description
-keywords: your keywords
-author: your name
-email: your email
+title: JD's Blog
+subtitle: little front engineer
+description: 3 level 3
+keywords:
+author: yangjd
+email: 403297504@qq.com
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
