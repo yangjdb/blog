@@ -9,19 +9,19 @@
 #    target: _blank    是否跳出，省略则在当前页面打开
 menu:
   home:
-    text: Home
+    text: 主页
     url: /
   archives:
-    text: Archives
+    text: 归档
     url: /archives
   tags:
-    text: Tags
+    text: 标签
     url: /tags
   th-list:
-    text: Categories
+    text: 分类
     url: /categories
   github:
-    url: https://github.com/yangjdb/blog
+    url: https://github.com/yangjdb
     target: _blank
 
 # 你的头像url
@@ -75,7 +75,7 @@ toc:
   list_number: true  # 是否显示数字排序
 
 # 文章页留言内容，hexo中所有变量及辅助函数等均可调用，具体请查阅 hexo.io
-postMessage: 这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="<%- url_for(page.path).replace(/index\.html$/, '') %>" target="_blank" rel="external"><%- page.permalink.replace(/index\.html$/, '') %></a>
+postMessage: 原文链接：<a href="<%- url_for(page.path).replace(/index\.html$/, '') %>" target="_blank" rel="external"><%- page.permalink.replace(/index\.html$/, '') %></a>
 
 # 站长统计，如要开启，输入CNZZ站点id，如 cnzz: 1255152447
 cnzz: false
@@ -111,14 +111,14 @@ gitment: false
 
 # Valine Comment system. https://valine.js.org
 valine:
-  enable: false # 如果你想使用valine，请将值设置为 true
-  appId:  # your leancloud appId
-  appKey:  # your leancloud appKey
+  enable: true # 如果你想使用valine，请将值设置为 true
+  appId: 8f2jtp35iwryaOweYfJQkScN-gzGzoHsz # your leancloud appId
+  appKey: IBwJAowLHFMTIeO2kf0yLSBN # your leancloud appKey
   notify: false # Mail notify
   verify: false # Verify code
   avatar: mm # Gravatar style : mm/identicon/monsterid/wavatar/retro/hide
-  placeholder: Just go go # Comment Box placeholder
-  guest_info: nick,mail,link # Comment header info
+  placeholder: 欢迎拍砖…… # Comment Box placeholder
+  guest_info: nick,mail # Comment header info
   pageSize: 10 # comment list page size
 
 
@@ -133,10 +133,10 @@ canonical: false
 since_year: 2017
 
 # 用户页面中作者相关的描述性文字，如不需要设为 false
-about: 用户页面中作者相关的描述性文字，如不需要设为 false
+about: 不爱挖坑的程序猿不是一个好猿
 
 # “不蒜子”访问量统计，详见 http://ibruce.info/2015/04/04/busuanzi/
-visit_counter: false
+visit_counter: true
 #  site_uv: 站点总访客数：
 #  site_pv: 站点总访问量：
 
@@ -150,7 +150,7 @@ title_change: false
 cdn: false
 
 # 设置为 true 将使用 lightbox render 图片
-lightbox: true
+lightbox: false
 
 # icp备案号  ICP_license: 京ICP备1234556号-1
 ICP_license: false
