@@ -49,7 +49,7 @@ export default d;
 
 nest意识到了这一点，所以通过泛型对象将module抽象出来，加上js动态编译（解释）的特点，灵活的重组了模块间的耦合，改变了原来的项目结构，与其说是框架，nest更像是脚手架，或者高阶模块构建工具。
 
-我们来看一下，通过nest的设计改造，上边的代码依赖关系变成如下：
+我们来看一下，通过nest的改造，上边的代码依赖关系变成如下：
 
     @moduleA
         imports: [moduleB, moduleC]
@@ -75,7 +75,7 @@ nest意识到了这一点，所以通过泛型对象将module抽象出来，加�
 ```js
 #A:
     @Dependencies()
-    (b, c)=>{
+    export (b, c)=>{
         this.b = b;
         this.c = c;
         return a
@@ -84,7 +84,7 @@ nest意识到了这一点，所以通过泛型对象将module抽象出来，加�
 ```js
 #B:
     @Dependencies()
-    (c)=>{
+    export (c)=>{
         this.c = c;
         return b
     }
@@ -92,7 +92,7 @@ nest意识到了这一点，所以通过泛型对象将module抽象出来，加�
 ```js
 #C:
     @Dependencies()
-    (d)=>{
+    export (d)=>{
         this.d = d;
         return c
     }
@@ -100,21 +100,80 @@ nest意识到了这一点，所以通过泛型对象将module抽象出来，加�
 ```js
 #D:
     @Dependencies()
-    ()=>{
+    export ()=>{
         return d;
     }
 ```
 
-可以看到，单个文件内已经不需要引入其他依赖模块，而是通过@Dependencies将所需要的模块实例化，立即注入自有模块实例，而这就是js的流程控制反转，也叫依赖注入，即需要的时候已经提供好实例对象。说到这里，有后台经验的同学是不是感到很亲切，没错，就是受java流程设计的理念影响，nest遵循单一职责，依赖倒置原则，用链路传递依赖，用注解代替定义。
+可以看到，单个文件内已经不需要引入其他依赖模块，转而变成了类导出，通过@Dependencies将所需要的模块注入，通过构造函数立即实例化并赋值给对象。这就是改造的流程控制反转，也叫依赖注入，即需要模块的时候已经提供好实例。有后台经验的同学看到这段代码应该不陌生吧，没错，就是受java的设计理念影响，nest参考ioc实现，遵循单一职责，依赖倒置原则，接口隔离原则，用链路传递依赖，用装饰代替定义。
 
 这样做，其目的只有一个：**隔离**
-隔离组织关系，隔离开发盲区，让协同的负影响降到最小。
+隔离业务关系，隔离开发盲区，让协同的负影响降到最小。
 
 ### 代码实现
 
-设计思路有了，接下来就是代码实现，上文中使用了@Dependencies作为注入句柄，作用就是将模块提供的类实例化后注入相应的业务对象中，起到粘合剂的作用，想必很多同学已经开始举手了，这不就是装饰器工厂么，对的，所以接下来我们先复习一下功课。
+设计思路有了，接下来就是代码实现，上文中使用了@Dependencies作为注入句柄，作用就是将模块提供的类实例化后注入相应的业务对象中，起到粘合剂的作用，说着这儿，想必很多同学已经看懂了，这不就是装饰器工厂么，对的，所以接下来我们先复习一下功课。
 
-    装饰器工厂作为js设计模式之一，通过装饰类实现接口解决不同的业务适配问题。
+    装饰器工厂是js设计模式之一，通过装饰类实现接口，以解决不同业务间适配问题。
+
+同样，还是上代码：
+```js
+Interface IAnimal{
+    speak(){}
+}
+
+class Cat implements IAnimal{
+    speak(){
+        console.log('miaomiao');
+    }
+}
+
+class Dog implements IAnimal{
+    speak(){
+        console.log('wangwang');
+    }
+}
+class AnimalDecorate {
+    constructor(Animal){
+        this.animal = new Animal;
+    }
+
+    animalSpeak(){
+        this.animal.speak();
+    }
+}
+
+var animal_1 = new AnimalDecorate(Dog);
+var animal_2 = new AminalDecorate(Cat);
+animal_1.animalSpeak(); //wangwang
+animal_2.animalSpeak(); //miaomiao
+```
+这是一段简单的装饰器伪代码，可以看到AnimalDecorate通过注入不同的类，产生不同的实例，但是最终执行的业务代码却是一样。
+那么复用到node的模块上面又该怎样？继续上代码
+```js
+let moduleDecorator = function(module, target){
+    ... //这里实例化module引入的其他组件，控制器，服务模块等
+    Object.defineProperty(target.prototype, 'module', module)
+    return target;
+}
+let moduleA = require('moduleA');
+let moduleB = require('moduleB');
+let CatsModule = class CatsModule {};
+let CatsController = require('CatsController');
+let CatsService = require('CatsService');
+CatsModule = moduleDecorator({
+    modules: [moduleA, moduleB],
+    controllers: [CatsController],
+    components: [CatsService],
+    exports: []
+}, CatsModule);
+exports.CatsModule = CatsModule;
+```
+这么写太难看了，优化一下
+```js
+...
+let CatsModule = Object.
+```
 
 **装饰器**
 > 装饰器是一种特殊类型的声明，它能够被附加到类声明，方法， 访问符，属性或参数上。 装饰器使用 @expression这种形式，expression求值后必须为一个函数，它会在运行时被调用，被装饰的声明信息做为参数传入。
