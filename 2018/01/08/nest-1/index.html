@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>nestjs 介绍（二） | A Little Front Engineer | 闻道有先后 术业有专攻</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="nestjs">
+    <meta name="description" content="原理 设计思路nest 通篇围绕module这个概念展开，将原本以commonjs规范为标准的模块化构建工程，改造为节点式的图状依赖模块关系，其中的每一个module都是一个节点，以节点为入为出，将实现代码封装在链路中并串联起来，透明掉了原本需要开发定义的模块关系。 说简单点，就是把各实现代码模块之间的require交付给上层，而上层模块则根据业务需求划分，模块之间彼此互不依赖，模块内的业务单元以">
+<meta name="keywords" content="nestjs node.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nestjs 介绍（二）">
+<meta property="og:url" content="https://yangjdb.github.io/blog/2018/01/08/nest-1/index.html">
+<meta property="og:site_name" content="A Little Front Engineer">
+<meta property="og:description" content="原理 设计思路nest 通篇围绕module这个概念展开，将原本以commonjs规范为标准的模块化构建工程，改造为节点式的图状依赖模块关系，其中的每一个module都是一个节点，以节点为入为出，将实现代码封装在链路中并串联起来，透明掉了原本需要开发定义的模块关系。 说简单点，就是把各实现代码模块之间的require交付给上层，而上层模块则根据业务需求划分，模块之间彼此互不依赖，模块内的业务单元以">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-10T03:27:48.147Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nestjs 介绍（二）">
+<meta name="twitter:description" content="原理 设计思路nest 通篇围绕module这个概念展开，将原本以commonjs规范为标准的模块化构建工程，改造为节点式的图状依赖模块关系，其中的每一个module都是一个节点，以节点为入为出，将实现代码封装在链路中并串联起来，透明掉了原本需要开发定义的模块关系。 说简单点，就是把各实现代码模块之间的require交付给上层，而上层模块则根据业务需求划分，模块之间彼此互不依赖，模块内的业务单元以">
+    
+        <link rel="alternate" type="application/atom+xml" title="A Little Front Engineer" href="/blog/atom.xml">
+    
+    <link rel="shortcut icon" href="/blog/./favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/./img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/./img/photo.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">yangjd</h5>
+          <a href="mailto:2420427860@qq.com" title="2420427860@qq.com" class="mail">2420427860@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/yangjdb" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">nestjs 介绍（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">nestjs 介绍（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-01-08T13:25:20.000Z" itemprop="datePublished" class="page-time">
+  2018-01-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/技术/">技术</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#原理"><span class="post-toc-number">1.</span> <span class="post-toc-text">原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#设计思路"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">设计思路</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#代码实现"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">代码实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#装饰器"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">装饰器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#小结"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">小结</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#推荐"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">推荐</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-nest-1"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">nestjs 介绍（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-01-08 21:25:20" datetime="2018-01-08T13:25:20.000Z"  itemprop="datePublished">2018-01-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/技术/">技术</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><hr>
+<h3 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h3><p>nest 通篇围绕<strong>module</strong>这个概念展开，将原本以<code>commonjs</code>规范为标准的模块化构建工程，改造为节点式的图状依赖模块关系，其中的每一个module都是一个节点，以节点为入为出，将实现代码封装在链路中并串联起来，透明掉了原本需要开发定义的模块关系。</p>
+<p>说简单点，就是把各实现代码模块之间的<code>require</code>交付给上层，而上层模块则根据业务需求划分，模块之间彼此互不依赖，模块内的业务单元以相同的结构化注入句柄（装饰器语法）把控制权反转给框架，从而做到统一的切面式处理。这种松散应用耦合的设计，强壮了骨架，透明了逻辑，灵活了业务。</p>
+<p>这种设计思路大家是不是觉得有点眼熟呢，对，<code>angular</code>，还有<code>vue</code>（单文件组件），都是基于这样的思想，正是因为这样的解耦设计，使得应用层面可以放心的搭配模块或者组件而不必担心代码混乱，造成后期不好维护的局面。</p>
+<p>废话不多说，还是举个栗子：<br>假设我们有A,B,C,D 4个文件，依赖如下:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#A</span><br><span class="line"><span class="keyword">import</span> b <span class="keyword">from</span> <span class="string">'B'</span>;</span><br><span class="line"><span class="keyword">import</span> c <span class="keyword">from</span> <span class="string">'C'</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">export</span> a;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#B</span><br><span class="line"><span class="keyword">import</span> c <span class="keyword">from</span> <span class="string">'C'</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">export</span> b;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#C</span><br><span class="line"><span class="keyword">import</span> d <span class="keyword">from</span> <span class="string">'D'</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">export</span> c;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#D</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> d;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，对于C模块，有写法上有重复引入，虽然在node的执行环境里，只解释编码一次并常驻内存，但是我们知道。<code>commonjs</code>的规范，模块是副本传值，就意味着每引入一次，就会拷贝一份内存堆栈，虽然内存冗余问题并不大，但是对于有洁癖的程序员来说，这是不能忍的。</p>
+<p>另外，我们无法规范每个开发人员的“引入习惯”，若没有一个好的架构设计支撑，协同开发出来的代码重复率有多高，看过整个项目的代码心里就会清楚。</p>
+<p>nest意识到了这一点，所以通过泛型对象将module抽象出来，加上js动态编译（解释）的特点，灵活的重组了模块间的结构，改变了原来的耦合关系，与其说是框架，nest更像是脚手架，或者高阶模块构建工具。</p>
+<p>我们来看一下，通过nest的改造，上边的代码依赖关系变成如下：</p>
+<pre><code>moduleA
+    imports: [moduleB, moduleC]
+    components: [class A]
+    exports: [instance of A]
+
+moduleB
+    imports: [moduleC]
+    components: [class B]
+    exports: [instance of B]
+
+moduleC
+    imports: [moduleD]
+    components: [class C]
+    exports: [instance of C]
+
+moduleD
+    components: [class D]
+    exprots: [instance of D]
+</code></pre><p>每个module的结构都已约定，通过封装，可以作为独立的业务单元，之前以层级关系依赖变成了节点依赖的结构</p>
+<p>再看每个类文件的内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#A:</span><br><span class="line">    @Dependencies()</span><br><span class="line">    <span class="keyword">export</span> (b, c)=&gt;&#123;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">        <span class="keyword">this</span>.c = c;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#B:</span><br><span class="line">    @Dependencies()</span><br><span class="line">    <span class="keyword">export</span> (c)=&gt;&#123;</span><br><span class="line">        <span class="keyword">this</span>.c = c;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#C:</span><br><span class="line">    @Dependencies()</span><br><span class="line">    <span class="keyword">export</span> (d)=&gt;&#123;</span><br><span class="line">        <span class="keyword">this</span>.d = d;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#D:</span><br><span class="line">    @Dependencies()</span><br><span class="line">    <span class="keyword">export</span> ()=&gt;&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'hello world'</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，每个文件已经不需要引入其他依赖模块，而变成了类导出，通过@Dependencies将所需要的模块注入，@这个标记我们先暂且放一边不管他，Dependencies句柄通过构造函数立即实例化并赋值给对象。而这就是流程控制反转，也叫依赖注入，即需要模块的时候已经提供好实例。有后台经验的同学看到这段代码应该不陌生吧，没错，就是受java的设计理念影响，nest参考ioc实现，遵循单一职责，依赖倒置原则，接口隔离原则，用链路传递依赖，用装饰代替定义。</p>
+<p>这样做，其目的只有一个：<strong>隔离</strong><br>隔离业务关系，隔离开发盲区，让协同的负影响降到最小。</p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>设计思路有了，接下来就是代码实现，上文中提到了Dependencies作为注入句柄，作用就是将模块提供的类实例化后注入相应的业务对象中，起到粘合剂的作用，说着这儿，想必很多同学已经看懂了，这不就是装饰器工厂么，对的，所以接下来我们先复习一下功课。</p>
+<pre><code>装饰器工厂是js设计模式之一，通过装饰类实现接口，以解决不同业务间适配问题。
+</code></pre><p>同样，还是上代码：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Interface IAnimal&#123;</span><br><span class="line">    speak()&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="title">implements</span> <span class="title">IAnimal</span></span>&#123;</span><br><span class="line">    speak()&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'miaomiao'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> <span class="title">implements</span> <span class="title">IAnimal</span></span>&#123;</span><br><span class="line">    speak()&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'wangwang'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnimalDecorate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(Animal)&#123;</span><br><span class="line">        <span class="keyword">this</span>.animal = <span class="keyword">new</span> Animal;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    animalSpeak()&#123;</span><br><span class="line">        <span class="keyword">this</span>.animal.speak();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> animal_1 = <span class="keyword">new</span> AnimalDecorate(Dog);</span><br><span class="line"><span class="keyword">var</span> animal_2 = <span class="keyword">new</span> AminalDecorate(Cat);</span><br><span class="line">animal_1.animalSpeak(); <span class="comment">//wangwang</span></span><br><span class="line">animal_2.animalSpeak(); <span class="comment">//miaomiao</span></span><br></pre></td></tr></table></figure></p>
+<p>这是一段简单的装饰器伪代码，可以看到AnimalDecorate通过注入不同的类，产生不同的实例，但是最终执行的业务代码却是一样。<br>那么复用到node的模块上面又该怎样？继续上代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> moduleDecorator = <span class="function"><span class="keyword">function</span>(<span class="params">module, target</span>)</span>&#123;</span><br><span class="line">    ... <span class="comment">//注入其他module提供的实例，包括组件，控制器，服务模块等</span></span><br><span class="line">    <span class="built_in">Object</span>.defineProperty(target.prototype, <span class="string">'module'</span>, <span class="built_in">module</span>)</span><br><span class="line">    ... <span class="comment">//实例化本module</span></span><br><span class="line">    <span class="keyword">return</span> target;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> moduleB = <span class="built_in">require</span>(<span class="string">'moduleB'</span>);</span><br><span class="line"><span class="keyword">let</span> moduleC = <span class="built_in">require</span>(<span class="string">'moduleC'</span>);</span><br><span class="line"><span class="keyword">let</span> moduleA = <span class="class"><span class="keyword">class</span> <span class="title">moduleA</span> </span>&#123;&#125;;</span><br><span class="line"><span class="keyword">let</span> controallerA = <span class="built_in">require</span>(<span class="string">'controallerA'</span>);</span><br><span class="line"><span class="keyword">let</span> serviceA = <span class="built_in">require</span>(<span class="string">'serviceA'</span>);</span><br><span class="line"></span><br><span class="line">moduleA = moduleDecorator(&#123;</span><br><span class="line">    modules: [moduleA, moduleB],</span><br><span class="line">    controllers: [controallerA],</span><br><span class="line">    components: [serviceA],</span><br><span class="line">    exports: [serviceA]</span><br><span class="line">&#125;, moduleA);</span><br><span class="line"></span><br><span class="line">exports.moduleA = moduleA;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码的作用只是将原有模块的类原型中添加其他实例，可以看出，我们只需要拿到类的句柄即可，装饰器moduleDecorator可以封装到核心库里。<br>所以，上边代码可以优化一下<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> core = <span class="built_in">require</span>(<span class="string">'core'</span>);</span><br><span class="line">...</span><br><span class="line">exports.moduleA = core.moduleDecorator(&#123;</span><br><span class="line">   modules: [moduleA, moduleB],</span><br><span class="line">   controllers: [controallerA],</span><br><span class="line">   components: [serviceA],</span><br><span class="line">   exports: [serviceA]</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>另外，es6提供了装饰器的实现，使用Reflect，还可以这样写<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> core = <span class="built_in">require</span>(<span class="string">'core'</span>);</span><br><span class="line">...</span><br><span class="line">core(<span class="built_in">Reflect</span>.decorate(moduleA, <span class="string">'module'</span>, &#123;</span><br><span class="line">   modules: [moduleA, moduleB],</span><br><span class="line">   controllers: [controallerA],</span><br><span class="line">   components: [serviceA],</span><br><span class="line">   exports: [serviceA]</span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line">exports.moduleA = moduleA;</span><br></pre></td></tr></table></figure></p>
+<p>但是这样还是不够优雅，不可能我们每个模块都这样写，也没有达到代码分离的作用，还是有很高的侵入性。而且由于Reflect.decorate（数据元反射）还是处在实验室阶段，所以还是<code>不推荐</code>使用</p>
+<p>那么是不是没有解决办法了呢，TypeScript表示呵呵哒，原生语法不支持，我可以造语法进行编译啊！！所以 <strong>@</strong> 出现了</p>
+<h3 id="装饰器"><a href="#装饰器" class="headerlink" title="装饰器"></a>装饰器</h3><blockquote>
+<p>装饰器是一种特殊类型的声明，它能够被附加到类声明，方法， 访问符，属性或参数上。 装饰器使用 @expression这种形式，expression求值后必须为一个函数，它会在运行时被调用，被装饰的声明信息做为参数传入。</p>
+</blockquote>
+<p>以上便是<code>TypeScript</code>对于装饰器的定义，这里就不多做说明了，详情请移步：<a href="https://www.tslang.cn/docs/handbook/decorators.html" target="_blank" rel="noopener">TypeScript装饰器</a><br>我重点介绍一下nest搭配ts常用的三种装饰器：类声明，方法，参数。</p>
+<p><strong>类声明</strong><br>@module()：模块化依赖关系装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@Module(&#123;</span><br><span class="line">    modules: [ConfigModule, UtilModule],</span><br><span class="line">    components: [CommonService],</span><br><span class="line">    exports: [CommonService]</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonModule</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@global()：全局对象/变量装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@global()</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalModule</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Component()：对象实例化装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Component()</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonService</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Dependency()：对象实例注入装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Dependencies(<span class="string">'Global'</span>, CommonService)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span></span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(global, commonService) &#123;</span><br><span class="line">        <span class="keyword">this</span>.global = global;</span><br><span class="line">        <span class="keyword">this</span>.commonService = commonService;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Controller()：路由装饰，之所以把路由单独成一个装饰器，是因为所有的服务入口都是基于路由控制，每个业务模块单元自实现MVC的业务流程，都是对象的集合，需要用标识来区分哪些是路由，哪些是服务，判断也仅仅需要一行代码<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Controller(<span class="string">'user'</span>)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span></span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Middleware()：中间件装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Middleware()</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">LoggerMiddleware</span> </span>&#123;</span><br><span class="line">    resolve(...args) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">`[<span class="subst">$&#123;args&#125;</span>] Request...`</span>);</span><br><span class="line">            next();</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>方法</strong><br>@Post：http post请求装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@Post(<span class="string">'/product/:id'</span>)</span><br><span class="line"><span class="keyword">async</span> productFindOne() &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Get：http get请求装饰<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@Get(<span class="string">'/login'</span>)</span><br><span class="line"><span class="keyword">async</span> login() &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>@Bind：http 参数注入装饰，适用于ES<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Post(<span class="string">'/product/:id'</span>)</span><br><span class="line">@Bind(Param(), Res())</span><br><span class="line"><span class="keyword">async</span> productFindOne(params, res) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>参数</strong>：参数装饰器，适用于TS<br>@Params()<br>@Req()<br>@Res()</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">CatsController</span> </span>&#123;</span><br><span class="line">    @Get()</span><br><span class="line">    findAll(@Params() params, @Req() request, @Res() res) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>装饰器工厂虽然不是新出的设计理念，但是在前端和node的应用场景却并不多，得益于java的控制反转，依赖注入实践参照，js使用装饰器完成了自身的反射机制，在框架层面上，angular补充了前端的空白，nest的出现补充了node的空白。这种核心层面向切面(AOP)，应用层面向对象(OOP)的编程方式，把node的模块依赖规则透明，使得项目结构耦合度很低，加上TS的预编译，模块复用率提高，拷贝成本大大降低，节省了内存消耗，这方面的性能测试报告后续会更新上来。</p>
+<p>原理就先介绍到这里，欢迎大家指正。</p>
+<h3 id="推荐"><a href="#推荐" class="headerlink" title="推荐"></a>推荐</h3><ul>
+<li><a href="http://blog.csdn.net/5hongbing/article/details/77927788" target="_blank" rel="noopener">Typescript中的装饰器原理</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/20297283" target="_blank" rel="noopener">TypeScript 中的 Decorator &amp; 元数据反射：从小白到专家</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-01-10T03:27:48.147Z" itemprop="dateUpdated">2018-01-10 11:27:48</time>
+</span><br>
+
+
+        
+        原文链接：<a href="/blog/2018/01/08/nest-1/" target="_blank" rel="external">https://yangjdb.github.io/blog/2018/01/08/nest-1/</a>
+            <p>尊重版权，如需转载，请注明出处。</p>
+        
+    </div>
+    <footer>
+        <a href="https://yangjdb.github.io/blog">
+            <img src="/blog/./img/photo.png" alt="yangjd">
+            yangjd
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/nestjs/">nestjs</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&title=《nestjs 介绍（二）》 — A Little Front Engineer&pic=https://yangjdb.github.io/blog./img/photo.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&title=《nestjs 介绍（二）》 — A Little Front Engineer&source=不爱挖坑的程序猿不是一个好猿" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://yangjdb.github.io/blog/2018/01/08/nest-1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《nestjs 介绍（二）》 — A Little Front Engineer&url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&via=https://yangjdb.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2018/01/07/nest/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">nestjs 介绍（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'false' == 'true',
+            appId: "8f2jtp35iwryaOweYfJQkScN-gzGzoHsz",
+            appKey: "IBwJAowLHFMTIeO2kf0yLSBN",
+            avatar: "mm",
+            placeholder: "欢迎拍砖……",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <!--<div class="top">-->
+        <!--
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        <span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        <span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+-->
+        <!--<p>-->
+            <!---->
+                <!--<span><a href="/blog/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>-->
+            <!---->
+            <!--<span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>-->
+        <!--</p>-->
+    <!--</div>-->
+    <div class="bottom">
+        <p><span> &copy;著作权归作者yangjd所有 2017 - 2018</span>
+            <span>
+                
+                <!--Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>-->
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&title=《nestjs 介绍（二）》 — A Little Front Engineer&pic=https://yangjdb.github.io/blog./img/photo.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&title=《nestjs 介绍（二）》 — A Little Front Engineer&source=不爱挖坑的程序猿不是一个好猿" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://yangjdb.github.io/blog/2018/01/08/nest-1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《nestjs 介绍（二）》 — A Little Front Engineer&url=https://yangjdb.github.io/blog/2018/01/08/nest-1/&via=https://yangjdb.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://yangjdb.github.io/blog/2018/01/08/nest-1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://yangjdb.github.io/blog/2018/01/08/nest-1/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
